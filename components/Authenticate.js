@@ -3,6 +3,7 @@ import { StyleSheet, Button, View, Modal } from 'react-native';
 import t from "tcomb-form-native";
 import Constants from 'expo-constants';
 import * as LocalAuthentication from "expo-local-authentication";
+import ConditionalView from "./ConditionalView";
 
 const Authenticate = props => {
     const [installationId, setInstallationId] = useState("");
@@ -83,29 +84,29 @@ const Authenticate = props => {
     return (
         <Modal visible={props.visible}>
             <View style={styles.container}>
-                <View style={styles.page}>
-                <Form 
-                    style={styles.form}
-                    type={Login} 
-                    options={options}
-                    ref={loginValueContainer}
-                />
-                <Button 
-                    title="Sign In" 
-                    onPress={submitLogin}
-                />
-             </View>
-            {/* <View style={styles.container}>
-                <Form    
-                    type={SignUp}
-                    options={options}
-                    ref={signUpValueContainer}
-                />
-                <Button 
-                    title="Sign Up" 
-                    onPress={submitSignUp}
-                />
-                </View> */}
+                <ConditionalView visible={false} style={styles.page}>
+                    <Form 
+                        style={styles.form}
+                        type={Login} 
+                        options={options}
+                        ref={loginValueContainer}
+                    />
+                    <Button 
+                        title="Sign In" 
+                        onPress={submitLogin}
+                    />
+                </ConditionalView>
+                <ConditionalView visible={false} style={styles.page}>
+                    <Form
+                        type={SignUp}
+                        options={options}
+                        ref={signUpValueContainer}
+                    />
+                    <Button 
+                        title="Sign Up" 
+                        onPress={submitSignUp}
+                    />
+                </ConditionalView>
             </View>
         </Modal>
     )
