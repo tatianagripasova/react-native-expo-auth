@@ -9,8 +9,10 @@ export default function App() {
       <Authenticate 
         onLogin={console.log} 
         onSignUp={console.log}
+        onBioLogin={console.log}
         visible={true}
         logins={["egor", "tatiana"]}
+        enableBio={true}
       />
     </View>
   );

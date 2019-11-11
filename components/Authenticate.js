@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Button, View, Modal } from 'react-native';
+import { StyleSheet, Button, View, Modal, Picker, Alert, Platform } from 'react-native';
 import t from "tcomb-form-native";
 import Constants from 'expo-constants';
 import * as LocalAuthentication from "expo-local-authentication";
@@ -7,10 +7,18 @@ import ConditionalView from "./ConditionalView";
 
 const Authenticate = props => {
     const [installationId, setInstallationId] = useState("");
+    const [login, setLogin] = useState(props.logins[0]);
+    const [checkBio, setCheckBio] = useState(false);
 
     useEffect(() => {
         setInstallationId(Constants.installationId);
+        checkBioSupport()
     }, []);
+
+    const checkBioSupport = async () => {
+        const result = await LocalAuthentication.isEnrolledAsync();
+        console.log(result);
+    };
 
     const Form = t.form.Form;
 
@@ -67,6 +75,38 @@ const Authenticate = props => {
         };
     };
 
+    const selectingLogin = selectedLogin => {
+        setLogin(selectedLogin);
+    };
+
+    scanFingerprint = async () => {
+        let result = await LocalAuthentication.authenticateAsync();
+        if (result.success)
+        props.onBioLogin({
+            installationId
+        });
+    };
+
+    showAndroidAlert = () => {
+        Alert.alert(
+          "Fingerprint Scan",
+          "Place your finger over the touch sensor and press scan.",
+          [
+            {
+              text: "Scan",
+              onPress: () => {
+                scanFingerprint();
+              },
+            },
+            {
+              text: "Cancel",
+              onPress: () => console.log('Cancel'),
+              style: 'cancel',
+            }
+          ]
+        );
+      };
+
     const options = {
         fields: {
           email: {
@@ -86,7 +126,6 @@ const Authenticate = props => {
             <View style={styles.container}>
                 <ConditionalView visible={false} style={styles.page}>
                     <Form 
-                        style={styles.form}
                         type={Login} 
                         options={options}
                         ref={loginValueContainer}
@@ -105,6 +144,22 @@ const Authenticate = props => {
                     <Button 
                         title="Sign Up" 
                         onPress={submitSignUp}
+                    />
+                </ConditionalView>
+                <ConditionalView visible={true} >
+                    <Picker
+                        selectedValue={login}
+                        onValueChange={selectingLogin}
+                    >
+                    {props.logins.map((login) => 
+                        (<Picker.Item key={login} label={login} value={login} />))
+                    }
+                    </Picker>
+                    <Button 
+                        title="Unlock" 
+                        onPress={
+                            Platform.OS === 'android' ? this.showAndroidAlert: this.scanFingerprint
+                        }
                     />
                 </ConditionalView>
             </View>
