@@ -6,7 +6,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!!</Text>
-      <Authenticate />
+      <Authenticate 
+        onLogin={console.log} 
+        onSignUp={console.log}
+        visible={true}
+        logins={["egor", "tatiana"]}
+      />
     </View>
   );
 }
