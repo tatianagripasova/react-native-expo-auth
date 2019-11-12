@@ -3,12 +3,37 @@ import { StyleSheet, Button, View, Modal, Picker, Alert, Platform } from 'react-
 import t from "tcomb-form-native";
 import Constants from 'expo-constants';
 import * as LocalAuthentication from "expo-local-authentication";
+import PropTypes from 'prop-types';
+
 import ConditionalView from "./ConditionalView";
+import { options } from "../lib/util";
 
 const Authenticate = props => {
+    Authenticate.propsTypes = {
+        onLogin: PropTypes.func,
+        onSignUp: PropTypes.func,
+        onBioLogin: PropTypes.func,
+        visible: PropTypes.bool,
+        logins: PropTypes.arrayOf(PropTypes.string),
+        enableBio: PropTypes.bool
+    };
+
     const [installationId, setInstallationId] = useState("");
     const [login, setLogin] = useState(props.logins[0]);
     const [checkBio, setCheckBio] = useState(false);
+    const [loginPage, setLoginPage] = useState(true);
+    const [signUpPage, setSignUpPage] = useState(false);
+    const [bioPage, setBioPage] = useState(false);
+
+    const signOrSignUp = () => {
+        setSignUpPage(!signUpPage);
+        setLoginPage(!loginPage);
+    };
+
+    const bioOrPassword = () => {
+        setLoginPage(!loginPage);
+        setBioPage(!bioPage);
+    };
 
     useEffect(() => {
         setInstallationId(Constants.installationId);
@@ -17,7 +42,7 @@ const Authenticate = props => {
 
     const checkBioSupport = async () => {
         const result = await LocalAuthentication.isEnrolledAsync();
-        console.log(result);
+        setCheckBio(result && props.enableBio);
     };
 
     const Form = t.form.Form;
@@ -30,11 +55,8 @@ const Authenticate = props => {
     };
 
     const validatePassword = (repeatPassword) => {
-        const pass = signUpValueContainer.current.getComponent("password").props.value;
-        if(pass === repeatPassword) {
-            return true;
-        }
-        return false;
+        const pass = signUpValueContainer.current.getComponent("password").props.value;     
+        return pass === repeatPassword;
     };
 
     const Email = t.refinement(t.String, validateEmail);
@@ -83,7 +105,8 @@ const Authenticate = props => {
         let result = await LocalAuthentication.authenticateAsync();
         if (result.success)
         props.onBioLogin({
-            installationId
+            installationId,
+            login
         });
     };
 
@@ -91,51 +114,39 @@ const Authenticate = props => {
         Alert.alert(
           "Fingerprint Scan",
           "Place your finger over the touch sensor and press scan.",
-          [
-            {
-              text: "Scan",
-              onPress: () => {
-                scanFingerprint();
-              },
-            },
-            {
-              text: "Cancel",
-              onPress: () => console.log('Cancel'),
-              style: 'cancel',
-            }
-          ]
+          [{ text: "Scan", onPress: () => scanFingerprint() },
+           { text: "Cancel", onPress: () => console.log('Cancel'), style: 'cancel' }]
         );
-      };
-
-    const options = {
-        fields: {
-          email: {
-            error: "Insert a valid email"
-          },
-          password: {
-              error: "Passwords should not be empty"
-          },
-          repeatPassword: {
-            error: "Passwords should match"
-            }
-        }
       };
 
     return (
         <Modal visible={props.visible}>
             <View style={styles.container}>
-                <ConditionalView visible={false} style={styles.page}>
+                <ConditionalView visible={loginPage} style={styles.page}>
                     <Form 
                         type={Login} 
                         options={options}
                         ref={loginValueContainer}
                     />
-                    <Button 
-                        title="Sign In" 
-                        onPress={submitLogin}
-                    />
+                    <View style={styles.signInButton}>
+                        <Button 
+                            title="Sign In" 
+                            onPress={submitLogin}
+                        />
+                    </View>
+                    {checkBio && 
+                        (<Button 
+                            title="Or Unlock with Face" 
+                            onPress={bioOrPassword}
+                        />)}
+                    <View style={styles.signUpButton}>
+                        <Button 
+                            title="Sign Up" 
+                            onPress={signOrSignUp}
+                        />
+                    </View>
                 </ConditionalView>
-                <ConditionalView visible={false} style={styles.page}>
+                <ConditionalView visible={signUpPage} style={styles.page}>
                     <Form
                         type={SignUp}
                         options={options}
@@ -145,8 +156,14 @@ const Authenticate = props => {
                         title="Sign Up" 
                         onPress={submitSignUp}
                     />
+                    <View style={styles.orSignInButton}>
+                        <Button 
+                            title="Or Sign In" 
+                            onPress={signOrSignUp}
+                        />
+                    </View>
                 </ConditionalView>
-                <ConditionalView visible={true} >
+                <ConditionalView visible={bioPage} >
                     <Picker
                         selectedValue={login}
                         onValueChange={selectingLogin}
@@ -161,6 +178,12 @@ const Authenticate = props => {
                             Platform.OS === 'android' ? this.showAndroidAlert: this.scanFingerprint
                         }
                     />
+                    <View style={styles.orUsePasswordButton}>
+                        <Button 
+                            title="Or use password"
+                            onPress={bioOrPassword}
+                        />
+                    </View>
                 </ConditionalView>
             </View>
         </Modal>
@@ -175,6 +198,18 @@ const styles = StyleSheet.create({
     },
     page: {
         width: "80%"
+    }, 
+    signInButton: {
+        margin: 10
+    }, 
+    signUpButton: {
+        marginTop: 50
+    }, 
+    orSignInButton: {
+        marginTop: 20
+    }, 
+    orUsePasswordButton: {
+        marginTop: 20
     }
 });
 
