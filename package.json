@@ -1,25 +1,50 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
+  "name": "react-native-expo-auth",
+  "version": "0.0.1",
+  "description": "A simple and fully customizable React Native Expo component that implements Sign In and Sign Up flows including Biometric Unlock.",
+  "main": "index.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "eject": "expo eject"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tatianagripasova/react-native-expo-auth"
+  },
+  "keywords": [
+    "react-native",
+    "react-component",
+    "react-native-component",
+    "react",
+    "react native",
+    "mobile",
+    "ios",
+    "android",
+    "auth",
+    "authentication",
+    "biometric unlock",
+    "sign in",
+    "sign up"
+  ],
+  "author": "Tatiana Gripasova",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tatianagripasova/react-native-expo-auth/issues"
+  },
+  "homepage": "https://github.com/tatianagripasova/react-native-expo-auth#readme",
+  "peerDependencies": {
+    "expo": "^35.0.0",
+    "react": "16.8.3",
+    "react-dom": "16.8.3",
+    "react-native": "*",
+    "react-native-web": "^0.11.7"
   },
   "dependencies": {
-    "expo": "^35.0.0",
     "expo-constants": "~7.0.0",
     "expo-local-authentication": "^7.0.0",
     "prop-types": "^15.7.2",
-    "react": "16.8.3",
-    "react-dom": "16.8.3",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz",
-    "react-native-web": "^0.11.7",
     "tcomb-form-native": "^0.6.20"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.1.0"
-  },
-  "private": true
+  }
 }
