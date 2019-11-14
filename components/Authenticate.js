@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Button, View, Modal, Picker, Alert, Platform } from 'react-native';
+import { StyleSheet, Button, View, Modal, Picker, Alert, Platform, Text } from 'react-native';
 import t from "tcomb-form-native";
 import Constants from 'expo-constants';
 import * as LocalAuthentication from "expo-local-authentication";
@@ -15,7 +15,8 @@ const Authenticate = props => {
         onBioLogin: PropTypes.func,
         visible: PropTypes.bool,
         logins: PropTypes.arrayOf(PropTypes.string),
-        enableBio: PropTypes.bool
+        enableBio: PropTypes.bool,
+        error: PropTypes.string
     };
 
     const [installationId, setInstallationId] = useState("");
@@ -42,7 +43,7 @@ const Authenticate = props => {
 
     const checkBioSupport = async () => {
         const result = await LocalAuthentication.isEnrolledAsync();
-        setCheckBio(result && props.enableBio);
+        setCheckBio(result && props.enableBio && props.logins && props.logins.length);
     };
 
     const Form = t.form.Form;
@@ -122,6 +123,7 @@ const Authenticate = props => {
     return (
         <Modal visible={props.visible}>
             <View style={styles.container}>
+                {props.error && (<Text style={styles.error}>{props.error}</Text>)}
                 <ConditionalView visible={loginPage} style={styles.page}>
                     <Form 
                         type={Login} 
@@ -199,6 +201,11 @@ const styles = StyleSheet.create({
     page: {
         width: "80%"
     }, 
+    error: {
+        color: "red",
+        fontSize: 20, 
+        marginBottom: 10
+    },
     signInButton: {
         margin: 10
     }, 
