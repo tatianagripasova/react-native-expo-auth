@@ -6,7 +6,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import PropTypes from 'prop-types';
 
 import ConditionalView from "./ConditionalView";
-import { options } from "../lib/util";
+import { options, resetOptions } from "../lib/util";
 
 const Authenticate = props => {
     Authenticate.propsTypes = {
@@ -24,6 +24,8 @@ const Authenticate = props => {
     const [loginPage, setLoginPage] = useState(true);
     const [signUpPage, setSignUpPage] = useState(false);
     const [bioPage, setBioPage] = useState(false);
+    const [email, setEmail] = useState(null);
+    const [forgotPage, setForgotPage] = useState(false);
     const [error, setError] = useState(null);
 
     const signOrSignUp = () => {
@@ -35,6 +37,12 @@ const Authenticate = props => {
     const bioOrPassword = () => {
         setLoginPage(!loginPage);
         setBioPage(!bioPage);
+        setError(null);
+    };
+
+    const signOrForgot = () => {
+        setForgotPage(!forgotPage);
+        setLoginPage(!loginPage);
         setError(null);
     };
 
@@ -74,6 +82,29 @@ const Authenticate = props => {
         email: Email, 
         password: t.String,
         repeatPassword: Password
+    });
+
+    const PinCode = t.struct({
+       email: Email
+    });
+
+    const emailValueContainer = useRef();
+
+    const submitPinCodeRequest = async() => {
+        const data = emailValueContainer.current.getValue();
+        if(data) {
+            const result = await props.onPinCodeRequest(data);
+            if(result.error) {
+                setError(result.error);
+            } else {
+                setEmail(data.email);
+            }
+        };
+    };
+
+    const ResetPassword = t.struct({
+        secretCode: t.Number,
+        newPassword: Password
     });
 
     const loginValueContainer = useRef();
@@ -137,7 +168,7 @@ const Authenticate = props => {
             <View style={styles.container}>
                 {error && (<Text style={styles.error}>{error}</Text>)}
                 <ConditionalView visible={loginPage} style={styles.page}>
-                    <Form 
+                    <Form
                         type={Login} 
                         options={options}
                         ref={loginValueContainer}
@@ -147,14 +178,18 @@ const Authenticate = props => {
                             title="Sign In" 
                             onPress={submitLogin}
                         />
+                        <Button
+                            title="Forgot password?"
+                            onPress={signOrForgot}
+                        />
                     </View>
                     {checkBio && 
-                        (<Button 
+                        (<Button
                             title="Or Unlock with Face" 
                             onPress={bioOrPassword}
                         />)}
                     <View style={styles.signUpButton}>
-                        <Button 
+                        <Button
                             title="Sign Up" 
                             onPress={signOrSignUp}
                         />
@@ -166,12 +201,12 @@ const Authenticate = props => {
                         options={options}
                         ref={signUpValueContainer}
                     />
-                    <Button 
+                    <Button
                         title="Sign Up" 
                         onPress={submitSignUp}
                     />
                     <View style={styles.orSignInButton}>
-                        <Button 
+                        <Button
                             title="Or Sign In" 
                             onPress={signOrSignUp}
                         />
@@ -186,18 +221,38 @@ const Authenticate = props => {
                         (<Picker.Item key={login} label={login} value={login} />))
                     }
                     </Picker>
-                    <Button 
+                    <Button
                         title="Unlock" 
                         onPress={
                             Platform.OS === 'android' ? this.showAndroidAlert: this.scanFingerprint
                         }
                     />
                     <View style={styles.orUsePasswordButton}>
-                        <Button 
+                        <Button
                             title="Or use password"
                             onPress={bioOrPassword}
                         />
                     </View>
+                </ConditionalView>
+                <ConditionalView visible={forgotPage&&!email} style={styles.page}>
+                    <Form
+                        type={PinCode}
+                        options={resetOptions}
+                        ref={emailValueContainer}
+                    />
+                    <Button
+                        title="Submit"
+                        onPress={submitPinCodeRequest}
+                    />
+                    <Button
+                        title="Sign In"
+                        onPress={signOrForgot}
+                    />
+                </ConditionalView>
+                <ConditionalView visible={forgotPage&&email} style={styles.page}>
+                    <Form
+                        
+                    />
                 </ConditionalView>
             </View>
         </Modal>
