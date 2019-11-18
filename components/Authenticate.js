@@ -15,8 +15,7 @@ const Authenticate = props => {
         onBioLogin: PropTypes.func,
         visible: PropTypes.bool,
         logins: PropTypes.arrayOf(PropTypes.string),
-        enableBio: PropTypes.bool,
-        error: PropTypes.string
+        enableBio: PropTypes.bool
     };
 
     const [installationId, setInstallationId] = useState("");
@@ -25,15 +24,18 @@ const Authenticate = props => {
     const [loginPage, setLoginPage] = useState(true);
     const [signUpPage, setSignUpPage] = useState(false);
     const [bioPage, setBioPage] = useState(false);
+    const [error, setError] = useState(null);
 
     const signOrSignUp = () => {
         setSignUpPage(!signUpPage);
         setLoginPage(!loginPage);
+        setError(null);
     };
 
     const bioOrPassword = () => {
         setLoginPage(!loginPage);
         setBioPage(!bioPage);
+        setError(null);
     };
 
     useEffect(() => {
@@ -76,25 +78,31 @@ const Authenticate = props => {
 
     const loginValueContainer = useRef();
 
-    const submitLogin = () => {
+    const submitLogin = async () => {
         const data = loginValueContainer.current.getValue();
         if(data) {
-            props.onLogin({
+            const result = await props.onLogin({
                 ...data,
                 installationId
             });
+            if (result.error) {
+                setError(result.error);
+            }
         };
     };
 
     const signUpValueContainer = useRef();
 
-    const submitSignUp = () => {
+    const submitSignUp = async () => {
         const data = signUpValueContainer.current.getValue();
         if(data) {
-            props.onSignUp({
+            const result = await props.onSignUp({
                 ...data, 
                 installationId
             });
+            if (result.error) {
+                setError(result.error);
+            }
         };
     };
 
@@ -104,11 +112,15 @@ const Authenticate = props => {
 
     scanFingerprint = async () => {
         let result = await LocalAuthentication.authenticateAsync();
-        if (result.success)
-        props.onBioLogin({
-            installationId,
-            login
-        });
+        if (result.success) {
+            const res = await props.onBioLogin({
+                installationId,
+                login
+            });
+            if (res.error) {
+                setError(res.error);
+            }
+        };
     };
 
     showAndroidAlert = () => {
@@ -123,7 +135,7 @@ const Authenticate = props => {
     return (
         <Modal visible={props.visible}>
             <View style={styles.container}>
-                {props.error && (<Text style={styles.error}>{props.error}</Text>)}
+                {error && (<Text style={styles.error}>{error}</Text>)}
                 <ConditionalView visible={loginPage} style={styles.page}>
                     <Form 
                         type={Login} 
