@@ -13,6 +13,8 @@ const Authenticate = props => {
         onLogin: PropTypes.func,
         onSignUp: PropTypes.func,
         onBioLogin: PropTypes.func,
+        onPinCodeRequest: PropTypes.func, 
+        onSubmitNewPassword: PropTypes.func,
         visible: PropTypes.bool,
         logins: PropTypes.arrayOf(PropTypes.string),
         enableBio: PropTypes.bool
@@ -66,7 +68,7 @@ const Authenticate = props => {
     };
 
     const validatePassword = (repeatPassword) => {
-        const pass = signUpValueContainer.current.getComponent("password").props.value;     
+        const pass = signUpValueContainer.current.getComponent("password").props.value;  
         return pass === repeatPassword;
     };
 
@@ -98,15 +100,35 @@ const Authenticate = props => {
                 setError(result.error);
             } else {
                 setEmail(data.email);
+                setError(null);
             }
         };
     };
 
     const ResetPassword = t.struct({
         secretCode: t.Number,
-        newPassword: Password
+        password: t.String
     });
 
+    const resetPasswordContainer = useRef();
+
+    const submitNewPassword = async () => {
+        const data = resetPasswordContainer.current.getValue();
+        if(data) {
+            const result = await props.onSubmitNewPassword({
+                ...data, 
+                email
+            });
+            if(result.error) {
+                setError(result.error);
+            } else {
+                setEmail(null);
+                signOrForgot();
+                setError(null);
+            }
+        };
+    };
+    
     const loginValueContainer = useRef();
 
     const submitLogin = async () => {
@@ -245,13 +267,22 @@ const Authenticate = props => {
                         onPress={submitPinCodeRequest}
                     />
                     <Button
-                        title="Sign In"
+                        title="Cancel"
                         onPress={signOrForgot}
                     />
                 </ConditionalView>
                 <ConditionalView visible={forgotPage&&email} style={styles.page}>
+                    <View style={styles.emailText}>
+                        <Text style={{ fontSize: 20 }}>{email}</Text>
+                    </View>
                     <Form
-                        
+                        type={ResetPassword}
+                        options={options}
+                        ref={resetPasswordContainer}
+                    />
+                    <Button 
+                        title="Submit"
+                        onPress={submitNewPassword}
                     />
                 </ConditionalView>
             </View>
@@ -284,6 +315,9 @@ const styles = StyleSheet.create({
     }, 
     orUsePasswordButton: {
         marginTop: 20
+    }, 
+    emailText: {
+        marginBottom: 20
     }
 });
 
