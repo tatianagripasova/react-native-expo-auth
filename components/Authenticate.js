@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Button, View, Modal, Picker, Alert, Platform, Text } from 'react-native';
+import { StyleSheet, View, Modal, Picker, Alert, Platform, Text } from 'react-native';
+import { Button } from 'react-native-elements';
 import t from "tcomb-form-native";
 import Constants from 'expo-constants';
 import * as LocalAuthentication from "expo-local-authentication";
@@ -195,25 +196,32 @@ const Authenticate = props => {
                         options={options}
                         ref={loginValueContainer}
                     />
-                    <View style={styles.signInButton}>
-                        <Button 
-                            title="Sign In" 
-                            onPress={submitLogin}
-                        />
-                        <Button
-                            title="Forgot password?"
-                            onPress={signOrForgot}
-                        />
+                    <View>
+                        <View style={styles.signInButton}>
+                            <Button 
+                                title="Sign In" 
+                                onPress={submitLogin}
+                            />
+                        </View>
+                        <View style={styles.forgotPasswordButton}>
+                            <Button
+                                title="Forgot password?"
+                                onPress={signOrForgot}
+                                type="clear"
+                            />
+                        </View>
                     </View>
                     {checkBio && 
                         (<Button
                             title="Or Unlock with Face" 
                             onPress={bioOrPassword}
+                            type="clear"
                         />)}
                     <View style={styles.signUpButton}>
                         <Button
                             title="Sign Up" 
                             onPress={signOrSignUp}
+                            type="clear"
                         />
                     </View>
                 </ConditionalView>
@@ -231,6 +239,7 @@ const Authenticate = props => {
                         <Button
                             title="Or Sign In" 
                             onPress={signOrSignUp}
+                            type="clear"
                         />
                     </View>
                 </ConditionalView>
@@ -253,6 +262,7 @@ const Authenticate = props => {
                         <Button
                             title="Or use password"
                             onPress={bioOrPassword}
+                            type="clear"
                         />
                     </View>
                 </ConditionalView>
@@ -266,10 +276,13 @@ const Authenticate = props => {
                         title="Submit"
                         onPress={submitPinCodeRequest}
                     />
-                    <Button
-                        title="Cancel"
-                        onPress={signOrForgot}
-                    />
+                    <View style={styles.cancelButton}>
+                        <Button
+                            title="Cancel"
+                            onPress={signOrForgot}
+                            type="clear"
+                        />
+                    </View>
                 </ConditionalView>
                 <ConditionalView visible={forgotPage&&email} style={styles.page}>
                     <View style={styles.emailText}>
@@ -284,6 +297,13 @@ const Authenticate = props => {
                         title="Submit"
                         onPress={submitNewPassword}
                     />
+                    <View style={styles.cancelButton}>
+                        <Button
+                            title="Cancel"
+                            onPress={signOrForgot}
+                            type="clear"
+                        />
+                    </View>
                 </ConditionalView>
             </View>
         </Modal>
@@ -307,6 +327,12 @@ const styles = StyleSheet.create({
     signInButton: {
         margin: 10
     }, 
+    forgotPasswordButton: {
+        marginTop: 7
+    },
+    cancelButton: {
+        marginTop: 10
+    },
     signUpButton: {
         marginTop: 50
     }, 
