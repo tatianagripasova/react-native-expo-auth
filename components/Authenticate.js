@@ -189,6 +189,7 @@ const Authenticate = props => {
     return (
         <Modal visible={props.visible}>
             <View style={styles.container}>
+                {props.children}
                 {error && (<Text style={styles.error}>{error}</Text>)}
                 <ConditionalView visible={loginPage} style={styles.page}>
                     <Form
