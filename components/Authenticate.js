@@ -54,6 +54,13 @@ const Authenticate = props => {
         checkBioSupport()
     }, []);
 
+    useEffect(() => {
+        checkBioSupport();
+        if (props.logins && props.logins.length) {
+            setLogin(props.logins[0]);
+        }
+    }, [props.logins]);
+
     const checkBioSupport = async () => {
         const result = await LocalAuthentication.isEnrolledAsync();
         setCheckBio(result && props.enableBio && props.logins && props.logins.length);
@@ -169,7 +176,7 @@ const Authenticate = props => {
         if (result.success) {
             const res = await props.onBioLogin({
                 installationId,
-                login
+                email: login
             });
             if (res.error) {
                 setError(res.error);
@@ -212,7 +219,7 @@ const Authenticate = props => {
                             />
                         </View>
                     </View>
-                    {checkBio && 
+                    {!!checkBio && 
                         (<Button
                             title="Or Unlock with Face" 
                             onPress={bioOrPassword}
