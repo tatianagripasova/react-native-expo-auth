@@ -146,9 +146,7 @@ const Authenticate = props => {
                 ...data,
                 installationId
             });
-            if (result.error) {
-                setError(result.error);
-            }
+            setError(result.error);
         };
     };
 
