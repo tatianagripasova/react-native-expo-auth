@@ -1,6 +1,6 @@
 {
   "name": "react-native-expo-auth",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "description": "A simple and fully customizable React Native Expo component that implements Sign In and Sign Up flows including Biometric Unlock.",
   "main": "index.js",
   "scripts": {
