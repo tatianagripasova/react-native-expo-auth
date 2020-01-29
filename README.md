@@ -1,6 +1,6 @@
 # react-native-expo-auth
 
-> React Native Expo Component that provides Sign In, Sign Up, Reset Password flows for user authentication. The component includes an API for FaceID and TouchID (iOS) and Fingerprint API (Android) to authenticate the user with a face or fingerprint scan.
+React Native Expo Component that provides Sign In, Sign Up, Reset Password flows for user authentication. The component includes an API for FaceID and TouchID (iOS) and Fingerprint API (Android) to authenticate the user with a face or fingerprint scan.
 
 ![Autocomplete Example](auth.gif)
 
